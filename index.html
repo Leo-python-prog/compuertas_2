@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Circuitos Lógicos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .gate-info {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gate-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffd700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .gate-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .truth-table {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .truth-table table {
+            border-collapse: collapse;
+            color: white;
+        }
+
+        .truth-table th, .truth-table td {
+            padding: 8px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .truth-table th {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+
+        .circuit-container {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .circuit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .input-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 20px;
+        }
+
+        .switch {
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch.on {
+            background: #4CAF50;
+        }
+
+        .switch::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch.on::before {
+            transform: translateX(30px);
+        }
+
+        .gate-symbol {
+            width: 120px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            border: 3px solid #fff;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .output {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .output-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .output-value {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .output-value.high {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .output-value.low {
+            background: #f44336;
+            color: white;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button:active {
+            transform: translateY(0);
+        }
+
+        .gate-counter {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin: 0 15px;
+        }
+
+        .wire {
+            width: 30px;
+            height: 2px;
+            background: #ffd700;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .circuit {
+                gap: 20px;
+            }
+            
+            .gate-symbol {
+                width: 100px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Simulador de Circuitos Lógicos</h1>
+        <p class="subtitle">Aprende cómo funcionan las compuertas lógicas de forma interactiva</p>
+        
+        <div class="gate-info" id="gateInfo">
+            <!-- Información de la compuerta actual -->
+        </div>
+        
+        <div class="circuit-container">
+            <div class="circuit" id="circuit">
+                <!-- Circuito dinámico -->
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button class="nav-button" onclick="previousGate()">◀ Anterior</button>
+            <span class="gate-counter" id="gateCounter">1 / 3</span>
+            <button class="nav-button" onclick="nextGate()">Siguiente ▶</button>
+        </div>
+    </div>
+
+    <script>
+        let currentGate = 0;
+        let inputA = false;
+        let inputB = false;
+
+        const gates = [
+            {
+                name: 'AND',
+                symbol: 'AND',
+                description: 'La compuerta AND devuelve 1 (verdadero) solo cuando TODAS las entradas son 1. Si cualquier entrada es 0, la salida será 0.',
+                truthTable: [
+                    ['A', 'B', 'Salida'],
+                    ['0', '0', '0'],
+                    ['0', '1', '0'],
+                    ['1', '0', '0'],
+                    ['1', '1', '1']
+                ],
+                logic: (a, b) => a && b,
+                inputs: 2
+            },
+            {
+                name: 'OR',
+                symbol: 'OR',
+                description: 'La compuerta OR devuelve 1 (verdadero) cuando AL MENOS UNA de las entradas es 1. Solo devuelve 0 cuando todas las entradas son 0.',
+                truthTable: [
+                    ['A', 'B', 'Salida'],
+                    ['0', '0', '0'],
+                    ['0', '1', '1'],
+                    ['1', '0', '1'],
+                    ['1', '1', '1']
+                ],
+                logic: (a, b) => a || b,
+                inputs: 2
+            },
+            {
+                name: 'NOT',
+                symbol: 'NOT',
+                description: 'La compuerta NOT (inversora) devuelve el valor OPUESTO de la entrada. Si la entrada es 1, la salida es 0, y viceversa.',
+                truthTable: [
+                    ['A', 'Salida'],
+                    ['0', '1'],
+                    ['1', '0']
+                ],
+                logic: (a) => !a,
+                inputs: 1
+            }
+        ];
+
+        function updateGateInfo() {
+            const gate = gates[currentGate];
+            const gateInfo = document.getElementById('gateInfo');
+            
+            let truthTableHTML = '<table>';
+            gate.truthTable.forEach((row, index) => {
+                const tag = index === 0 ? 'th' : 'td';
+                truthTableHTML += '<tr>';
+                row.forEach(cell => {
+                    truthTableHTML += `<${tag}>${cell}</${tag}>`;
+                });
+                truthTableHTML += '</tr>';
+            });
+            truthTableHTML += '</table>';
+            
+            gateInfo.innerHTML = `
+                <div class="gate-name">${gate.name}</div>
+                <div class="gate-description">${gate.description}</div>
+                <div class="truth-table">
+                    <h4>Tabla de Verdad:</h4>
+                    ${truthTableHTML}
+                </div>
+            `;
+        }
+
+        function updateCircuit() {
+            const gate = gates[currentGate];
+            const circuit = document.getElementById('circuit');
+            
+            if (gate.inputs === 2) {
+                circuit.innerHTML = `
+                    <div class="inputs">
+                        <div class="input-group">
+                            <span class="input-label">A:</span>
+                            <div class="switch ${inputA ? 'on' : ''}" onclick="toggleInput('A')"></div>
+                            <span>${inputA ? '1' : '0'}</span>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-label">B:</span>
+                            <div class="switch ${inputB ? 'on' : ''}" onclick="toggleInput('B')"></div>
+                            <span>${inputB ? '1' : '0'}</span>
+                        </div>
+                    </div>
+                    <div class="wire"></div>
+                    <div class="gate-symbol">${gate.symbol}</div>
+                    <div class="wire"></div>
+                    <div class="output">
+                        <span class="output-label">Salida:</span>
+                        <div class="output-value ${getOutput() ? 'high' : 'low'}">${getOutput() ? '1' : '0'}</div>
+                    </div>
+                `;
+            } else {
+                circuit.innerHTML = `
+                    <div class="inputs">
+                        <div class="input-group">
+                            <span class="input-label">A:</span>
+                            <div class="switch ${inputA ? 'on' : ''}" onclick="toggleInput('A')"></div>
+                            <span>${inputA ? '1' : '0'}</span>
+                        </div>
+                    </div>
+                    <div class="wire"></div>
+                    <div class="gate-symbol">${gate.symbol}</div>
+                    <div class="wire"></div>
+                    <div class="output">
+                        <span class="output-label">Salida:</span>
+                        <div class="output-value ${getOutput() ? 'high' : 'low'}">${getOutput() ? '1' : '0'}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function toggleInput(input) {
+            if (input === 'A') {
+                inputA = !inputA;
+            } else if (input === 'B') {
+                inputB = !inputB;
+            }
+            updateCircuit();
+        }
+
+        function getOutput() {
+            const gate = gates[currentGate];
+            if (gate.inputs === 2) {
+                return gate.logic(inputA, inputB);
+            } else {
+                return gate.logic(inputA);
+            }
+        }
+
+        function nextGate() {
+            currentGate = (currentGate + 1) % gates.length;
+            updateAll();
+        }
+
+        function previousGate() {
+            currentGate = (currentGate - 1 + gates.length) % gates.length;
+            updateAll();
+        }
+
+        function updateAll() {
+            updateGateInfo();
+            updateCircuit();
+            document.getElementById('gateCounter').textContent = `${currentGate + 1} / ${gates.length}`;
+        }
+
+        // Inicializar la aplicación
+        updateAll();
+    </script>
+</body>
+</html>
