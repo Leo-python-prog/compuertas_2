@@ -168,7 +168,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: #333;
             border: 3px solid #fff;
@@ -293,7 +293,7 @@
         
         <div class="navigation">
             <button class="nav-button" onclick="previousGate()">◀ Anterior</button>
-            <span class="gate-counter" id="gateCounter">1 / 3</span>
+            <span class="gate-counter" id="gateCounter">1 / 6</span>
             <button class="nav-button" onclick="nextGate()">Siguiente ▶</button>
         </div>
     </div>
@@ -343,6 +343,48 @@
                 ],
                 logic: (a) => !a,
                 inputs: 1
+            },
+            {
+                name: 'NAND',
+                symbol: 'NAND',
+                description: 'La compuerta NAND es la NEGACIÓN de AND. Devuelve 0 solo cuando TODAS las entradas son 1. En cualquier otro caso devuelve 1.',
+                truthTable: [
+                    ['A', 'B', 'Salida'],
+                    ['0', '0', '1'],
+                    ['0', '1', '1'],
+                    ['1', '0', '1'],
+                    ['1', '1', '0']
+                ],
+                logic: (a, b) => !(a && b),
+                inputs: 2
+            },
+            {
+                name: 'NOR',
+                symbol: 'NOR',
+                description: 'La compuerta NOR es la NEGACIÓN de OR. Devuelve 1 solo cuando TODAS las entradas son 0. Si cualquier entrada es 1, la salida será 0.',
+                truthTable: [
+                    ['A', 'B', 'Salida'],
+                    ['0', '0', '1'],
+                    ['0', '1', '0'],
+                    ['1', '0', '0'],
+                    ['1', '1', '0']
+                ],
+                logic: (a, b) => !(a || b),
+                inputs: 2
+            },
+            {
+                name: 'XOR',
+                symbol: 'XOR',
+                description: 'La compuerta XOR (OR exclusivo) devuelve 1 cuando las entradas son DIFERENTES. Devuelve 0 cuando ambas entradas son iguales.',
+                truthTable: [
+                    ['A', 'B', 'Salida'],
+                    ['0', '0', '0'],
+                    ['0', '1', '1'],
+                    ['1', '0', '1'],
+                    ['1', '1', '0']
+                ],
+                logic: (a, b) => a !== b,
+                inputs: 2
             }
         ];
 
